@@ -14,6 +14,8 @@ func main() {
 	checkErr(err)
 	defer db.Close()
 
+	initDB(dbName)
+
 	router := mux.NewRouter()
 	router.HandleFunc("/nodes", getTreeHandler).Methods("GET")
 	router.HandleFunc("/nodes", addNodeHandler).Methods("POST")

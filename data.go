@@ -20,7 +20,8 @@ var scheme = `CREATE TABLE IF NOT EXISTS nodes (
 				name varchar(255) NOT NULL,
 				image varchar(255) NOT NULL,
 				lft integer NOT NULL,
-				rgt integer NOT NULL);`
+				rgt integer NOT NULL,
+				depth integer NOT NULL);`
 
 /* do we really need size of images?
 type Image struct {
@@ -37,8 +38,7 @@ type Node struct {
 	Image string `json:"image"`
 	Lft   int    `json:"lft,omitempty"`
 	Rgt   int    `json:"rgt,omitempty"`
-	// do we need to store depth of node?
-	//depth int	 `json:"depth"`
+	Depth int    `json:"depth,omitempty"`
 }
 
 //Nodes type
@@ -74,7 +74,7 @@ func initDB(name string) {
 	_, err = db.Exec(scheme)
 	checkErr(err)
 
-	initRoot := "INSERT INTO nodes(name, image, lft, rgt) VALUES(?, ?, 1, 2); "
+	initRoot := "INSERT INTO nodes(name, image, lft, rgt, depth) VALUES(?, ?, 1, 2, 1); "
 	initName := "You"
 	initImage := "../images/you.png"
 	_, err = db.Exec(initRoot, initName, initImage)
@@ -83,11 +83,12 @@ func initDB(name string) {
 
 // GetAllNodesFromDB is a function that recieving all nodes from database into struct Nodes
 func (db DB) getAllNodesFromDB() (nodes Nodes, err error) {
-	query := `SELECT node.id, node.name, node.image, node.lft, node.rgt
+	query := `SELECT node.id, node.name, node.image, node.lft, node.rgt, node.depth
 				FROM nodes as node,
 					nodes as parent
 				WHERE node.lft BETWEEN parent.lft and parent.rgt
-						AND parent.id = 1
+					AND parent.id = node.id
+				GROUP BY node.id
 				ORDER BY node.lft`
 	rows, err := db.Query(query)
 	checkErr(err)
@@ -95,7 +96,7 @@ func (db DB) getAllNodesFromDB() (nodes Nodes, err error) {
 	nodes = ns
 	for rows.Next() {
 		var n Node
-		err := rows.Scan(&n.ID, &n.Name, &n.Image, &n.Lft, &n.Rgt)
+		err := rows.Scan(&n.ID, &n.Name, &n.Image, &n.Lft, &n.Rgt, &n.Depth)
 		checkErr(err)
 		nodes = append(nodes, n)
 	}
@@ -109,18 +110,18 @@ func (db DB) insertNodeIntoDB(parentID int, name string, image string) (err erro
 	checkErr(err)
 
 	var lockTable = "LOCK TABLE nodes WRITE"
-	var selectVal = `	SELECT nodes.lft, nodes.rgt
+	var selectVal = `	SELECT nodes.lft, nodes.rgt, nodes.depth
 						FROM nodes
 						WHERE id = ?`
 	var updateRight = "UPDATE nodes SET rgt = rgt + 2 WHERE rgt > ?"
 	var updateLeft = "UPDATE nodes SET lft = lft + 2 WHERE lft > ?"
-	var insert = "INSERT INTO nodes(name, image, lft, rgt) VALUES(?, ?, ? + 1, ? + 2)"
+	var insert = "INSERT INTO nodes(name, image, lft, rgt, depth) VALUES(?, ?, ? + 1, ? + 2, ? + 1)"
 	var unlockTable = "UNLOCK TABLES"
 
-	var lft, rgt, val int
+	var lft, rgt, dep, val int
 
 	tx.Exec(lockTable)
-	err = tx.QueryRow(selectVal, parentID).Scan(&lft, &rgt)
+	err = tx.QueryRow(selectVal, parentID).Scan(&lft, &rgt, &dep)
 	checkErr(err)
 
 	if (rgt - lft) > 1 {
@@ -132,7 +133,7 @@ func (db DB) insertNodeIntoDB(parentID int, name string, image string) (err erro
 	tx.Exec(updateRight, val)
 	tx.Exec(updateLeft, val)
 
-	tx.Exec(insert, name, image, val, val)
+	tx.Exec(insert, name, image, val, val, dep)
 
 	tx.Exec(unlockTable)
 	tx.Commit()
