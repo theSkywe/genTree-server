@@ -6,6 +6,7 @@ import (
 )
 
 func getTreeHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("COntent-type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "*")
 
@@ -19,6 +20,7 @@ func getTreeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func addNodeHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("COntent-type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "*")
 
@@ -41,6 +43,7 @@ func addNodeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteNodeHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("COntent-type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "*")
 

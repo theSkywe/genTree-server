@@ -124,7 +124,7 @@ func (db DB) insertNodeIntoDB(parentID int, name string, image string) (err erro
 	err = tx.QueryRow(selectVal, parentID).Scan(&lft, &rgt, &dep)
 	checkErr(err)
 
-	if (rgt - lft) > 1 {
+	if (rgt - lft) < 1 {
 		val = rgt
 	} else {
 		val = lft
@@ -151,8 +151,8 @@ func (db DB) deleteNodeFromDB(id int) (err error) {
 						FROM nodes
 						WHERE id = ?`
 	var delete = "DELETE FROM nodes WHERE lft BETWEEN ? AND ?"
-	var updateRight = "UPDATE nodes SET rgt = ? - ? WHERE rgt > ?"
-	var updateLeft = "UPDATE nodes SET lft = ? - ? WHERE lft > ?"
+	var updateRight = "UPDATE nodes SET rgt = rgt - ? WHERE rgt > ?"
+	var updateLeft = "UPDATE nodes SET lft = lft - ? WHERE lft > ?"
 	var unlockTable = "UNLOCK TABLES"
 
 	var lft, rgt, width int
@@ -165,8 +165,8 @@ func (db DB) deleteNodeFromDB(id int) (err error) {
 
 	tx.Exec(delete, lft, rgt)
 
-	tx.Exec(updateRight, rgt, width, rgt)
-	tx.Exec(updateLeft, lft, width, rgt)
+	tx.Exec(updateRight, width, rgt)
+	tx.Exec(updateLeft, width, rgt)
 
 	tx.Exec(unlockTable)
 	tx.Commit()
