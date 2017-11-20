@@ -6,10 +6,6 @@ import (
 )
 
 func getTreeHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-type", "application/json")
-	w.Header().Set("Access-Control-Allow-Methods", "*")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-
 	db, err := newOpen("mysql", dbCOnnectionString)
 	checkErr(err)
 	defer db.Close()
@@ -20,11 +16,6 @@ func getTreeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func addNodeHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-type", "application/json")
-	w.Header().Set("Access-Control-Allow-Methods", "*")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-
-	//params := mux.Vars(r)
 	db, err := newOpen("mysql", dbCOnnectionString)
 	checkErr(err)
 	defer db.Close()
@@ -43,10 +34,6 @@ func addNodeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteNodeHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-type", "application/json")
-	w.Header().Set("Access-Control-Allow-Methods", "*")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-
 	db, err := newOpen("mysql", dbCOnnectionString)
 	checkErr(err)
 	defer db.Close()

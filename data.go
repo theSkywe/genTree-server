@@ -34,8 +34,8 @@ type Image struct {
 // Node type struct
 type Node struct {
 	ID    int    `json:"id,omitempty"`
-	Name  string `json:"name"`
-	Image string `json:"image"`
+	Name  string `json:"name,omitempty"`
+	Image string `json:"image,omitempty"`
 	Lft   int    `json:"lft,omitempty"`
 	Rgt   int    `json:"rgt,omitempty"`
 	Depth int    `json:"depth,omitempty"`
