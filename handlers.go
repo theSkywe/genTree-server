@@ -33,7 +33,7 @@ func addNodeHandler(w http.ResponseWriter, r *http.Request) {
 	var n Node
 
 	n.ID, _ = strconv.Atoi(r.FormValue("id"))
-	n.Name = r.FormValue("Name")
+	n.Name = r.FormValue("name")
 
 	files := form.File["image"]
 	imageFile, err := files[0].Open()
