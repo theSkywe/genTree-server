@@ -76,7 +76,7 @@ func initDB(name string) {
 
 	initRoot := "INSERT INTO nodes(name, image, lft, rgt, depth) VALUES(?, ?, 1, 2, 1); "
 	initName := "You"
-	initImage := "../images/you.png"
+	initImage := "uploaded/you.png"
 	_, err = db.Exec(initRoot, initName, initImage)
 	checkErr(err)
 }

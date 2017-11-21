@@ -23,6 +23,8 @@ func main() {
 	originsOk := handlers.AllowedOrigins([]string{"*"})
 	methodsOk := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "UPDATE", "DELETE", "OPTIONS"})
 
+	s := http.StripPrefix("/uploaded/", http.FileServer(http.Dir("./uploaded/")))
+	router.PathPrefix("/uploaded/").Handler(s)
 	router.HandleFunc("/nodes", getTreeHandler).Methods("GET")
 	router.HandleFunc("/nodes", addNodeHandler).Methods("POST")
 	router.HandleFunc("/nodes/{id}", deleteNodeHandler).Methods("DELETE")
